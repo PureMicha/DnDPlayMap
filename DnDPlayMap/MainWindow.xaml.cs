@@ -57,10 +57,12 @@ namespace DnDPlayMap
             if (OnOff)
             {
                 GameMap.EditingMode = InkCanvasEditingMode.None;
+                Zeichnung_AnAus.Content = "Zeichnung ist Aus";
 
             } else
             {
                 GameMap.EditingMode = InkCanvasEditingMode.Ink;
+                Zeichnung_AnAus.Content = "Zeichnung ist An";
             }
 
             OnOff = !OnOff;
