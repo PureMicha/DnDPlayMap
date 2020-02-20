@@ -45,10 +45,31 @@ namespace DnDPlayMap
         Point distanceStart = new Point(0, 0);
         TextBlock distanceValue = new TextBlock();
 
+        private double zoomFactor = 0.8;
+        private int zoomCount = 4;
+
 
         public MainWindow()
         {
             InitializeComponent();
+
+            KeyEventHandler HandleESCoF11 = (sendert, args) =>
+            {
+                if (args.Key == Key.Escape)
+                {
+                    MWindow.ResizeMode = ResizeMode.CanResize;
+                    MWindow.WindowState = WindowState.Normal;
+                    MWindow.WindowStyle = WindowStyle.ThreeDBorderWindow;
+                }
+                if (args.Key == Key.F11)
+                {
+                    MWindow.ResizeMode = ResizeMode.NoResize;
+                    MWindow.WindowState = WindowState.Maximized;
+                    MWindow.WindowStyle = WindowStyle.None;
+                }
+            };
+
+            this.PreviewKeyDown += HandleESCoF11;
         }
 
         // Button für Raster Umschaltung
@@ -355,6 +376,22 @@ namespace DnDPlayMap
             if (RadioRed.IsChecked == true)
             {
                 GameMap.DefaultDrawingAttributes.Color = Colors.Red;
+            }
+        }
+
+        private void ZoomPlus_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (CharakterToken unit in spielerFiguren)
+            {
+                
+            }
+        }
+
+        private void ZoomMinus_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (CharakterToken unit in spielerFiguren)
+            {
+                
             }
         }
     }
