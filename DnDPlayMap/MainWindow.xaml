@@ -7,7 +7,15 @@
         mc:Ignorable="d"
         Title="DnD interaktive Karte" Height="630.58" Width="1208.21" ContentRendered="Window_ContentRendered">
     <Grid x:Name="MapBackground" Background="Wheat">
-        <InkCanvas x:Name="GameMap" EditingMode="None">
+        <InkCanvas x:Name="GameMap" EditingMode="None" RenderTransformOrigin="0.5,0.5" Margin="0, 0, 0, 0">
+            <InkCanvas.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform x:Name="GameMapScale" ScaleX="1" ScaleY="1"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </InkCanvas.RenderTransform>
             <InkCanvas.Background>
                 <DrawingBrush TileMode="Tile" Viewport="-10,-10,60,60" ViewportUnits="Absolute">
                     <DrawingBrush.Drawing>
@@ -53,6 +61,6 @@
         </DockPanel>
         <Button x:Name="ZoomPlus" VerticalAlignment="Bottom" Height="40" Margin="0,0,100,15" Width="70" Content="+" FontSize="24" HorizontalAlignment="Center" Click="ZoomPlus_Click" />
         <Button x:Name="ZoomMinus" VerticalAlignment="Bottom" Height="40" Margin="0,0,250,15" Width="70" Content="-" FontSize="24" HorizontalAlignment="Center" Click="ZoomMinus_Click" />
-        <TextBlock x:Name="distanceValue2" HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" FontSize="16"/>
+        <TextBlock x:Name="distanceValue2" HorizontalAlignment="Left" Height="30" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" FontSize="16" Margin="10,10,0,0"/>
     </Grid>
 </Window>

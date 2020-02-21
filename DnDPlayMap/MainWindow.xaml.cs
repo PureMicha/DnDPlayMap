@@ -45,9 +45,9 @@ namespace DnDPlayMap
         private Point distanceStart = new Point(0, 0);
         private TextBlock distanceValue = new TextBlock();
 
-        private double zoomFactor = 10;
+        private double zoomFactor = 1.1;
+        private double marginFactor = 0.1;
         private int zoomCount = 0;
-        private int zoomEnable = 0;
 
 
         public MainWindow()
@@ -200,7 +200,7 @@ namespace DnDPlayMap
         {
             CharakterToken Unit = new CharakterToken();
 
-            Point startPunkt = new Point(180, 60);
+            Point startPunkt = new Point(300, 180);
             Unit.TokenID = IDStarter++;
 
             // Erstellung des UIElement
@@ -346,8 +346,8 @@ namespace DnDPlayMap
 
             Border borderReturn = new Border()
             {
-                Width = (MapSquareSize * Unit.Size) + (zoomEnable * (zoomFactor * Unit.Size * Math.Abs(zoomCount))),
-                Height = (MapSquareSize * Unit.Size) + (zoomEnable * (zoomFactor * Unit.Size * Math.Abs(zoomCount))),
+                Width = (MapSquareSize * Unit.Size),
+                Height = (MapSquareSize * Unit.Size),
                 Background = affiliation,
                 BorderThickness = new Thickness(4, 4, 4, 4),
                 BorderBrush = UnitBorder,
@@ -383,86 +383,21 @@ namespace DnDPlayMap
         private void ZoomPlus_Click(object sender, RoutedEventArgs e)
         {
 
-            // Drag&Drop Eventhandler für die Spielfiguren
-            MouseButtonEventHandler mouseDown = (sendert, args) => {
-                var element = (UIElement)sendert;
-                distance.X1 = InkCanvas.GetLeft(element) + (element.RenderSize.Width / 2);
-                distance.Y1 = InkCanvas.GetTop(element) + (element.RenderSize.Height / 2);
-                dragStart = args.GetPosition(element);
-                element.CaptureMouse();
-            };
-            MouseButtonEventHandler mouseUp = (sendert, args) => {
-                var element = (UIElement)sendert;
-                distance.Visibility = Visibility.Collapsed;
-                distanceValue.Visibility = Visibility.Collapsed;
-                distanceValue2.Visibility = Visibility.Collapsed;
-                dragStart = null;
-                distance.X1 = 0;
-                distance.Y1 = 0;
-                distance.X2 = 0;
-                distance.Y2 = 0;
-                element.ReleaseMouseCapture();
-            };
-            MouseEventHandler mouseMove = (sendert, args) => {
-                if (dragStart != null && args.LeftButton == MouseButtonState.Pressed)
-                {
-                    string distanceText = (Math.Round(((Math.Sqrt(Math.Pow(Math.Abs(distance.X1 - distance.X2), 2) + Math.Pow(Math.Abs(distance.Y1 - distance.Y2), 2))) / 40), 2)).ToString() + " m";
-                    var element = (UIElement)sendert;
-                    var p2 = args.GetPosition(GameMap);
-
-                    InkCanvas.SetLeft(element, p2.X - dragStart.Value.X);
-                    InkCanvas.SetTop(element, p2.Y - dragStart.Value.Y);
-                    distance.Visibility = Visibility.Visible;
-                    distance.X2 = InkCanvas.GetLeft(element) + (element.RenderSize.Width / 2);
-                    distance.Y2 = InkCanvas.GetTop(element) + (element.RenderSize.Height / 2);
-
-                    distanceValue.Text = distanceText;
-                    distanceValue2.Text = distanceText;
-                    distanceValue.FontSize = 16;
-                    distanceValue.Visibility = Visibility.Visible;
-                    distanceValue2.Visibility = Visibility.Visible;
-                    InkCanvas.SetLeft(distanceValue, (Math.Abs(distance.X1 + distance.X2) / 2) + 15);
-                    InkCanvas.SetTop(distanceValue, (Math.Abs(distance.Y1 + distance.Y2) / 2) - 30);
-                }
-            };
-            MouseButtonEventHandler mouseRightClick = (sendert, args) =>
-            {
-                GameMap.Children.Remove((UIElement)sendert);
-            };
-            Action<UIElement> enableDrag = (element) => {
-                element.MouseDown += mouseDown;
-                element.MouseMove += mouseMove;
-                element.MouseUp += mouseUp;
-                element.MouseRightButtonUp += mouseRightClick;
-            };
-
-            zoomCount = zoomCount + 1;
+            zoomCount++;
 
             ZoomMinus.IsEnabled = true;
 
-            if (zoomCount == 0)
+            GameMapScale.ScaleX *= zoomFactor;
+            GameMapScale.ScaleY *= zoomFactor;
+
+            if (zoomCount >= 0)
             {
-                zoomEnable = 0;
-            } else if (zoomCount > 0)
+                GameMap.Margin = new Thickness(0);
+
+            } else
             {
-                zoomEnable = 1;
-            }
+                GameMap.Margin = new Thickness((MWindow.Width * (marginFactor * Math.Abs(zoomCount))) * -1, (MWindow.Height * (marginFactor * Math.Abs(zoomCount))) * -1, (MWindow.Width * (marginFactor * Math.Abs(zoomCount))) * -1, (MWindow.Height * (marginFactor * Math.Abs(zoomCount))) * -1);
 
-            foreach (CharakterToken unit in spielerFiguren)
-            {
-
-                Point current = new Point(InkCanvas.GetLeft(unit.UIElement), InkCanvas.GetTop(unit.UIElement));
-
-                GameMap.Children.Remove(unit.UIElement);
-                unit.UIElement = BorderCreatorMethod(unit);
-
-                // Eventhandler für das neue Element aktivieren
-                enableDrag(unit.UIElement);
-                GameMap.Children.Add(unit.UIElement);
-
-                // Position des neuen Element im Canvas setzen
-                InkCanvas.SetTop(unit.UIElement, current.Y);
-                InkCanvas.SetLeft(unit.UIElement, current.X);
             }
 
             if (zoomCount >= 10)
@@ -473,89 +408,25 @@ namespace DnDPlayMap
 
         private void ZoomMinus_Click(object sender, RoutedEventArgs e)
         {
-
-            // Drag&Drop Eventhandler für die Spielfiguren
-            MouseButtonEventHandler mouseDown = (sendert, args) => {
-                var element = (UIElement)sendert;
-                distance.X1 = InkCanvas.GetLeft(element) + (element.RenderSize.Width / 2);
-                distance.Y1 = InkCanvas.GetTop(element) + (element.RenderSize.Height / 2);
-                dragStart = args.GetPosition(element);
-                element.CaptureMouse();
-            };
-            MouseButtonEventHandler mouseUp = (sendert, args) => {
-                var element = (UIElement)sendert;
-                distance.Visibility = Visibility.Collapsed;
-                distanceValue.Visibility = Visibility.Collapsed;
-                distanceValue2.Visibility = Visibility.Collapsed;
-                dragStart = null;
-                distance.X1 = 0;
-                distance.Y1 = 0;
-                distance.X2 = 0;
-                distance.Y2 = 0;
-                element.ReleaseMouseCapture();
-            };
-            MouseEventHandler mouseMove = (sendert, args) => {
-                if (dragStart != null && args.LeftButton == MouseButtonState.Pressed)
-                {
-                    string distanceText = (Math.Round(((Math.Sqrt(Math.Pow(Math.Abs(distance.X1 - distance.X2), 2) + Math.Pow(Math.Abs(distance.Y1 - distance.Y2), 2))) / 40), 2)).ToString() + " m";
-                    var element = (UIElement)sendert;
-                    var p2 = args.GetPosition(GameMap);
-
-                    InkCanvas.SetLeft(element, p2.X - dragStart.Value.X);
-                    InkCanvas.SetTop(element, p2.Y - dragStart.Value.Y);
-                    distance.Visibility = Visibility.Visible;
-                    distance.X2 = InkCanvas.GetLeft(element) + (element.RenderSize.Width / 2);
-                    distance.Y2 = InkCanvas.GetTop(element) + (element.RenderSize.Height / 2);
-
-                    distanceValue.Text = distanceText;
-                    distanceValue2.Text = distanceText;
-                    distanceValue.FontSize = 16;
-                    distanceValue.Visibility = Visibility.Visible;
-                    distanceValue2.Visibility = Visibility.Visible;
-                    InkCanvas.SetLeft(distanceValue, (Math.Abs(distance.X1 + distance.X2) / 2) + 15);
-                    InkCanvas.SetTop(distanceValue, (Math.Abs(distance.Y1 + distance.Y2) / 2) - 30);
-                }
-            };
-            MouseButtonEventHandler mouseRightClick = (sendert, args) =>
-            {
-                GameMap.Children.Remove((UIElement)sendert);
-            };
-            Action<UIElement> enableDrag = (element) => {
-                element.MouseDown += mouseDown;
-                element.MouseMove += mouseMove;
-                element.MouseUp += mouseUp;
-                element.MouseRightButtonUp += mouseRightClick;
-            };
-
-            zoomCount = zoomCount - 1;
+            
+            zoomCount--;
 
             ZoomPlus.IsEnabled = true;
 
-            if (zoomCount == 0)
+            GameMapScale.ScaleX /= zoomFactor;
+            GameMapScale.ScaleY /= zoomFactor;
+
+            if (zoomCount >= 0)
             {
-                zoomEnable = 0;
-            } else if (zoomCount < 0)
+                GameMap.Margin = new Thickness(0);
+
+            } else
             {
-                zoomEnable = -1;
+                GameMap.Margin = new Thickness((MWindow.Width * (marginFactor * Math.Abs(zoomCount))) * -1, (MWindow.Height * (marginFactor * Math.Abs(zoomCount))) * -1, (MWindow.Width * (marginFactor * Math.Abs(zoomCount))) * -1, (MWindow.Height * (marginFactor * Math.Abs(zoomCount))) * -1);
+
             }
 
-            foreach (CharakterToken unit in spielerFiguren)
-            {
-                Point current = new Point(InkCanvas.GetLeft(unit.UIElement), InkCanvas.GetTop(unit.UIElement));
-
-                GameMap.Children.Remove(unit.UIElement);
-                unit.UIElement = BorderCreatorMethod(unit);
-
-                // Eventhandler für das neue Element aktivieren
-                enableDrag(unit.UIElement);
-                GameMap.Children.Add(unit.UIElement);
-
-                // Position des neuen Element im Canvas setzen
-                InkCanvas.SetTop(unit.UIElement, current.Y);
-                InkCanvas.SetLeft(unit.UIElement, current.X);
-            }
-
-            if (zoomCount <= -2)
+            if (zoomCount <= -5)
             {
                 ZoomMinus.IsEnabled = false;
             }
