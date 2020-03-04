@@ -190,6 +190,7 @@ namespace DnDPlayMap
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Player;
                     Unit.UIElement = BorderCreatorMethod(Unit);
+                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
                     spielerFiguren.Add(Unit);
 
                 } else if ((bool)Ally.IsChecked)
@@ -198,6 +199,7 @@ namespace DnDPlayMap
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Ally;
                     Unit.UIElement = BorderCreatorMethod(Unit);
+                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
                     allies.Add(Unit);
 
                 } else if ((bool)FoeM.IsChecked)
@@ -206,6 +208,7 @@ namespace DnDPlayMap
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Foe;
                     Unit.UIElement = BorderCreatorMethod(Unit);
+                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
                     monster.Add(Unit);
 
                 } else if ((bool)FoeL.IsChecked)
@@ -214,6 +217,7 @@ namespace DnDPlayMap
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Foe;
                     Unit.UIElement = BorderCreatorMethod(Unit);
+                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
                     monster.Add(Unit);
 
                 } else
@@ -222,6 +226,7 @@ namespace DnDPlayMap
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Foe;
                     Unit.UIElement = BorderCreatorMethod(Unit);
+                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
                     monster.Add(Unit);
                 }
                 
@@ -283,6 +288,7 @@ namespace DnDPlayMap
             // Eventhandler für das neue Element aktivieren
             enableDrag(Unit.UIElement);
             GameMap.Children.Add(Unit.UIElement);
+            InitiativeTracker.Children.Add(Unit.InitiativeMember);
 
             // Position des neuen Element im Canvas setzen
             InkCanvas.SetTop(Unit.UIElement, startPunkt.Y - 10);
@@ -354,6 +360,23 @@ namespace DnDPlayMap
             {
                 GameMap.DefaultDrawingAttributes.Color = Colors.Red;
             }
+        }
+
+        // Methode zur Erstellung der Spielfigur im InitiativenTracker 
+        private TextBox InitiativeMemberCreator(CharakterToken Unit)
+        {
+            TextBox initiative = new TextBox()
+            {
+                Width = 120,
+                Height = 23,
+                IsReadOnly = true,
+                Text = "test" + IDStarter.ToString(),
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 10 + ((IDStarter - 1) * 23), 0, 0)
+            };
+
+            return initiative;
         }
     }
 }
