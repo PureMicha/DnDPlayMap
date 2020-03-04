@@ -41,15 +41,17 @@ namespace DnDPlayMap
         // Wert für die Größe von Charakteren
         enum CreatureSize { Medium = 1, Large = 2, ExtraLarge = 3, Gigantic = 4, Small = 1 }
 
+        // Drag&Drop Entfernungskomponenten
         private Line distance = new Line();
         private Point distanceStart = new Point(0, 0);
         private TextBlock distanceValue = new TextBlock();
 
+        // Zoomvariablen
         private double zoomFactor = 1.1;
         private double marginFactor = 0.1;
         private int zoomCount = 0;
 
-
+        // Kreation des Windows
         public MainWindow()
         {
             InitializeComponent();
@@ -364,6 +366,7 @@ namespace DnDPlayMap
             return borderReturn;
         }
 
+        // Check der Radiobutton zur Bestimmung der Zeichenfarbe
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
             if (RadioBlack.IsChecked == true)
@@ -380,6 +383,7 @@ namespace DnDPlayMap
             }
         }
 
+        // Button-Click zum Reinzoomen
         private void ZoomPlus_Click(object sender, RoutedEventArgs e)
         {
 
@@ -406,6 +410,7 @@ namespace DnDPlayMap
             }
         }
 
+        // Button-Click zum Rauszoomen
         private void ZoomMinus_Click(object sender, RoutedEventArgs e)
         {
             
