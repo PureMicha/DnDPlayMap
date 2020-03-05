@@ -189,8 +189,8 @@ namespace DnDPlayMap
                     Unit.Size = (int)CreatureSize.Medium;
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Player;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
+                    Unit.BorderCreatorMethod(MapSquareSize, IDStarter, UnitBorder);
+                    Unit.InitiativeMember = Initiativetracker.InitiativeMemberCreator(Unit);
                     spielerFiguren.Add(Unit);
 
                 } else if ((bool)Ally.IsChecked)
@@ -198,8 +198,8 @@ namespace DnDPlayMap
                     Unit.Size = (int)CreatureSize.Medium;
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Ally;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
+                    Unit.BorderCreatorMethod(MapSquareSize, IDStarter, UnitBorder);
+                    Unit.InitiativeMember = Initiativetracker.InitiativeMemberCreator(Unit);
                     allies.Add(Unit);
 
                 } else if ((bool)FoeM.IsChecked)
@@ -207,8 +207,8 @@ namespace DnDPlayMap
                     Unit.Size = (int)CreatureSize.Medium;
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Foe;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
+                    Unit.BorderCreatorMethod(MapSquareSize, IDStarter, UnitBorder);
+                    Unit.InitiativeMember = Initiativetracker.InitiativeMemberCreator(Unit);
                     monster.Add(Unit);
 
                 } else if ((bool)FoeL.IsChecked)
@@ -216,8 +216,8 @@ namespace DnDPlayMap
                     Unit.Size = (int)CreatureSize.Large;
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Foe;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
+                    Unit.BorderCreatorMethod(MapSquareSize, IDStarter, UnitBorder);
+                    Unit.InitiativeMember = Initiativetracker.InitiativeMemberCreator(Unit);
                     monster.Add(Unit);
 
                 } else
@@ -225,8 +225,8 @@ namespace DnDPlayMap
                     Unit.Size = (int)CreatureSize.ExtraLarge;
                     Unit.Name = UnitName.Text;
                     Unit.Side = (int)Affiliation.Foe;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    Unit.InitiativeMember = InitiativeMemberCreator(Unit);
+                    Unit.BorderCreatorMethod(MapSquareSize, IDStarter, UnitBorder);
+                    Unit.InitiativeMember = Initiativetracker.InitiativeMemberCreator(Unit);
                     monster.Add(Unit);
                 }
                 
@@ -288,64 +288,13 @@ namespace DnDPlayMap
             // Eventhandler für das neue Element aktivieren
             enableDrag(Unit.UIElement);
             GameMap.Children.Add(Unit.UIElement);
-            InitiativeTracker.Children.Add(Unit.InitiativeMember);
 
             // Position des neuen Element im Canvas setzen
             InkCanvas.SetTop(Unit.UIElement, startPunkt.Y - 10);
             InkCanvas.SetLeft(Unit.UIElement, startPunkt.X - 10);
         }
 
-        // Methode zur Erstellung des UIElement für Spielfiguren
-        private Border BorderCreatorMethod(CharakterToken Unit)
-        {
-            Brush affiliation = Brushes.Gray;
-
-            string name = "";
-
-            switch (Unit.Side)
-            {
-                case (int)Affiliation.Player:
-                    affiliation = Brushes.Green;
-                    name = "P";
-                    break;
-                case (int)Affiliation.Ally:
-                    affiliation = Brushes.SlateBlue;
-                    name = "A";
-                    break;
-                case (int)Affiliation.Foe:
-                    affiliation = Brushes.Red;
-                    name = "M";
-                    break;
-            }
-
-            if (UnitName.Text.Equals(""))
-            {
-                name = name + IDStarter.ToString();
-            } else
-            {
-                name = UnitName.Text;
-            }
-
-            Border borderReturn = new Border()
-            {
-                Width = MapSquareSize * Unit.Size,
-                Height = MapSquareSize * Unit.Size,
-                Background = affiliation,
-                BorderThickness = new Thickness(4, 4, 4, 4),
-                BorderBrush = UnitBorder,
-                CornerRadius = new CornerRadius(100),
-                Child = new TextBlock()
-                {
-                    Text = name,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                }
-
-            };
-
-            return borderReturn;
-        }
-
+        // Veränderung der Stylusfarbe
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
             if (RadioBlack.IsChecked == true)
@@ -361,22 +310,6 @@ namespace DnDPlayMap
                 GameMap.DefaultDrawingAttributes.Color = Colors.Red;
             }
         }
-
-        // Methode zur Erstellung der Spielfigur im InitiativenTracker 
-        private TextBox InitiativeMemberCreator(CharakterToken Unit)
-        {
-            TextBox initiative = new TextBox()
-            {
-                Width = 120,
-                Height = 23,
-                IsReadOnly = true,
-                Text = "test" + IDStarter.ToString(),
-                VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                Margin = new Thickness(0, 10 + ((IDStarter - 1) * 23), 0, 0)
-            };
-
-            return initiative;
-        }
+        
     }
 }
