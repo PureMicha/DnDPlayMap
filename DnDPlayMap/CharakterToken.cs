@@ -17,7 +17,7 @@ namespace DnDPlayMap
 
         public UIElement UIElement { get; set; }
 
-        public TextBox InitiativeMember { get; set; }
+        public TextBlock InitiativeMember { get; set; }
 
         public int TokenID { get; set; }
         
