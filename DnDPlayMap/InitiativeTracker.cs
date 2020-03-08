@@ -31,19 +31,22 @@ namespace DnDPlayMap
         }
 
         // Methode zur Erstellung der Spielfigur im InitiativenTracker 
-        public TextBlock InitiativeMemberCreator(CharakterToken Unit)
+        public Border InitiativeMemberCreator(CharakterToken Unit)
         {
-            TextBlock initiativeMember = new TextBlock()
+            Border initiativeMember = new Border()
             {
                 Width = 120,
                 Height = 23,
-                Text = Unit.Name,
-                Background = Brushes.White,
-                TextAlignment = TextAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Top,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                //muss überarbeitet werden
-                Margin = new Thickness(0, 10 + ((children.Count) * 23), 0, 0)
+                BorderThickness = new Thickness(2),
+                BorderBrush = Brushes.Black,
+                Background = Unit.getColor(),
+                Child = new TextBlock()
+                {
+                    Text = Unit.Name,
+                    TextAlignment = TextAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                }
             };
 
             // Drag&Drop Eventhandler für die Spielfiguren
@@ -63,8 +66,8 @@ namespace DnDPlayMap
                     var element = (UIElement)sendert;
                     var p2 = args.GetPosition(element);
                     
-                    Canvas.SetLeft(element, p2.X - dragStart.Value.X);
-                    Canvas.SetTop(element, p2.Y - dragStart.Value.Y);
+                    InitiativeTracker.SetLeft(element, p2.X - dragStart.Value.X);
+                    InitiativeTracker.SetTop(element, p2.Y - dragStart.Value.Y);
                 }
             };
             Action<UIElement> enableDrag = (element) => {
@@ -75,6 +78,9 @@ namespace DnDPlayMap
 
             enableDrag(initiativeMember);
             AddChild(initiativeMember);
+
+            InitiativeTracker.SetTop(initiativeMember, 10 + ((children.Count - 1) * 23));
+            InitiativeTracker.SetLeft(initiativeMember, 15);
 
             return initiativeMember;
         }

@@ -17,7 +17,7 @@ namespace DnDPlayMap
 
         public UIElement UIElement { get; set; }
 
-        public TextBlock InitiativeMember { get; set; }
+        public UIElement InitiativeMember { get; set; }
 
         public int TokenID { get; set; }
         
@@ -53,6 +53,7 @@ namespace DnDPlayMap
             if (this.Name.Equals(""))
             {
                 name = name + IDStarter.ToString();
+                this.Name = name;
             }
             else
             {
@@ -77,6 +78,27 @@ namespace DnDPlayMap
             };
 
             this.UIElement = borderSet;
+        }
+
+        public SolidColorBrush getColor()
+        {
+
+            SolidColorBrush colorReturn = Brushes.White;
+
+            switch (this.Side)
+            {
+                case (int)Affiliation.Player:
+                    colorReturn = Brushes.Green;
+                    break;
+                case (int)Affiliation.Ally:
+                    colorReturn = Brushes.SlateBlue;
+                    break;
+                case (int)Affiliation.Foe:
+                    colorReturn = Brushes.Red;
+                    break;
+            }
+
+            return colorReturn;
         }
 
     }
