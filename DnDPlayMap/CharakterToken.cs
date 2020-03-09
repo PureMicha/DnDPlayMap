@@ -9,13 +9,11 @@ using System.Windows.Media;
 
 namespace DnDPlayMap
 {
-    class CharakterToken
+    class CharakterToken : Border
     {
         enum Affiliation { Player = 1, Ally = 2, Foe = 3 };
 
         enum CreatureSize { Small = 1, Medium = 2, Large = 3, ExtraLarge = 4, Gigantic = 5}
-
-        public UIElement UIElement { get; set; }
 
         public UIElement InitiativeMember { get; set; }
 
@@ -23,61 +21,45 @@ namespace DnDPlayMap
         
         public int Side { get; set; }
 
-        public string Name { get; set; }
-
         public int Size { get; set; }
 
-        // Methode zur Erstellung des UIElement für Spielfiguren
-        public void BorderCreatorMethod(int MapSquareSize, int IDStarter, SolidColorBrush UnitBorder)
+        public CharakterToken(int MapSquareSize, int ID, string name, int side, int size)
         {
-            Brush affiliation = Brushes.Gray;
-
-            string name = "";
-
-            switch (this.Side)
+            if (name.Equals(""))
             {
-                case (int)Affiliation.Player:
-                    affiliation = Brushes.Green;
-                    name = "P";
-                    break;
-                case (int)Affiliation.Ally:
-                    affiliation = Brushes.SlateBlue;
-                    name = "A";
-                    break;
-                case (int)Affiliation.Foe:
-                    affiliation = Brushes.Red;
-                    name = "M";
-                    break;
-            }
-
-            if (this.Name.Equals(""))
-            {
-                name = name + IDStarter.ToString();
-                this.Name = name;
-            }
-            else
-            {
-                name = this.Name;
-            }
-
-            Border borderSet = new Border()
-            {
-                Width = MapSquareSize * this.Size,
-                Height = MapSquareSize * this.Size,
-                Background = affiliation,
-                BorderThickness = new Thickness(4, 4, 4, 4),
-                BorderBrush = UnitBorder,
-                CornerRadius = new CornerRadius(100),
-                Child = new TextBlock()
+                switch(side)
                 {
-                    Text = name,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
+                    case (int)Affiliation.Player:
+                        name = "P";
+                        break;
+                    case (int)Affiliation.Ally:
+                        name = "A";
+                        break;
+                    case (int)Affiliation.Foe:
+                        name = "M";
+                        break;
                 }
+                name = name + ID.ToString();
+            }
+            this.Name = name;
+            this.Side = side;
+            this.Size = size;
+            this.TokenID = ID;
 
+            BorderCreatorMethod(MapSquareSize, ID);
+        }
+
+        // Methode zur Erstellung des UIElement für Spielfiguren
+        private void BorderCreatorMethod(int MapSquareSize, int IDStarter)
+        {
+            Width = MapSquareSize * this.Size;
+            Height = MapSquareSize * this.Size;
+            Child = new TextBlock()
+            {
+                Text = this.Name,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
             };
-
-            this.UIElement = borderSet;
         }
 
         public SolidColorBrush getColor()

@@ -16,20 +16,6 @@ namespace DnDPlayMap
 
         private Nullable<Point> dragStart = null;
 
-        private void AddChild(UIElement element)
-        {
-            children.Add(element);
-            Children.Add(element);
-        }
-
-        public void RemoveChild(UIElement element)
-        {
-            if (children.Remove(element))
-            {
-                Children.Remove(element);
-            }
-        }
-
         // Methode zur Erstellung der Spielfigur im InitiativenTracker 
         public Border InitiativeMemberCreator(CharakterToken Unit)
         {
@@ -49,7 +35,7 @@ namespace DnDPlayMap
                 }
             };
 
-            // Drag&Drop Eventhandler für die Spielfiguren
+            // Drag&Drop Eventhandler für die Reihenfolge im Initiativetracker
             MouseButtonEventHandler mouseDown = (sendert, args) => {
                 var element = (UIElement)sendert;
                 dragStart = args.GetPosition(element);
@@ -64,7 +50,7 @@ namespace DnDPlayMap
                 if (dragStart != null && args.LeftButton == MouseButtonState.Pressed)
                 {
                     var element = (UIElement)sendert;
-                    var p2 = args.GetPosition(element);
+                    var p2 = args.GetPosition(this.Parent as UIElement);
                     
                     InitiativeTracker.SetLeft(element, p2.X - dragStart.Value.X);
                     InitiativeTracker.SetTop(element, p2.Y - dragStart.Value.Y);
@@ -77,9 +63,9 @@ namespace DnDPlayMap
             };
 
             enableDrag(initiativeMember);
-            AddChild(initiativeMember);
+            Children.Add(initiativeMember);
 
-            InitiativeTracker.SetTop(initiativeMember, 10 + ((children.Count - 1) * 23));
+            InitiativeTracker.SetTop(initiativeMember, 10 + ((Children.Count - 1) * 23));
             InitiativeTracker.SetLeft(initiativeMember, 15);
 
             return initiativeMember;
