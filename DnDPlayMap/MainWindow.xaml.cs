@@ -24,6 +24,7 @@ namespace DnDPlayMap
         const int MapSquareSize = 60;
         // Farbe Rand der Spielfiguren
         private SolidColorBrush UnitBorder = (SolidColorBrush)(new BrushConverter().ConvertFrom("#535353"));
+        private SolidColorBrush Selected = Brushes.White;
         // Wert für Karten-Raster Umschaltung
         private bool OnOff = false;
         // CharakterToken TokenID Starter
@@ -32,6 +33,7 @@ namespace DnDPlayMap
         private List<CharakterToken> spielerFiguren = new List<CharakterToken>();
         private List<CharakterToken> monster = new List<CharakterToken>();
         private List<CharakterToken> allies = new List<CharakterToken>();
+        private List<CharakterToken> all = new List<CharakterToken>();
         // Liste der Karten-Kacheln (UIElement)
         private List<UIElement> kartenKacheln = new List<UIElement>();
         // Wert für Start-Position für Drag&Drop
@@ -76,7 +78,9 @@ namespace DnDPlayMap
             {
                 foreach (CharakterToken unit in spielerFiguren)
                 {
-                    GameMap.Children.Remove(unit.UIElement);
+                    GameMap.Children.Remove(unit);
+                    all.Remove(unit);
+                    Initiativetracker.RemoveInitElement(unit.InitiativeMember);
                 }
                 spielerFiguren.Clear();
             }
@@ -84,7 +88,9 @@ namespace DnDPlayMap
             {
                 foreach (CharakterToken unit in allies)
                 {
-                    GameMap.Children.Remove(unit.UIElement);
+                    GameMap.Children.Remove(unit);
+                    all.Remove(unit);
+                    Initiativetracker.RemoveInitElement(unit.InitiativeMember);
                 }
                 allies.Clear();
             }
@@ -92,7 +98,9 @@ namespace DnDPlayMap
             {
                 foreach (CharakterToken unit in monster)
                 {
-                    GameMap.Children.Remove(unit.UIElement);
+                    GameMap.Children.Remove(unit);
+                    all.Remove(unit);
+                    Initiativetracker.RemoveInitElement(unit.InitiativeMember);
                 }
                 monster.Clear();
             }
@@ -100,6 +108,7 @@ namespace DnDPlayMap
             {
                 GameMap.Strokes.Clear();
             }
+            InitiativeUpdate();
 
         }
 
@@ -176,58 +185,73 @@ namespace DnDPlayMap
         // Button für Erstellung einer Spielfigur
         private void CharButton_Click(object sender, RoutedEventArgs e)
         {
-            CharakterToken Unit = new CharakterToken();
+            int size = 0;
+            int side = 0;
+            Brush affiliationColor = Brushes.Gray;
+
+            // Check und Erstellung der Spielfiguren auf dem Canvas
+            if ((bool)Player.IsChecked)
+            {
+
+                size = (int)CreatureSize.Medium;
+                side = (int)Affiliation.Player;
+                affiliationColor = Brushes.Green;
+
+            }
+            else if ((bool)Ally.IsChecked)
+            {
+                size = (int)CreatureSize.Medium;
+                side = (int)Affiliation.Ally;
+                affiliationColor = Brushes.SlateBlue;
+
+            }
+            else if ((bool)FoeM.IsChecked)
+            {
+                size = (int)CreatureSize.Medium;
+                side = (int)Affiliation.Foe;
+                affiliationColor = Brushes.Red;
+
+            }
+            else if ((bool)FoeL.IsChecked)
+            {
+                size = (int)CreatureSize.Large;
+                side = (int)Affiliation.Foe;
+                affiliationColor = Brushes.Red;
+            }
+            else
+            {
+                size = (int)CreatureSize.ExtraLarge;
+                side = (int)Affiliation.Foe;
+                affiliationColor = Brushes.Red;
+            }
+
+            CharakterToken Unit = new CharakterToken(MapSquareSize, ++IDStarter, UnitName.Text, side, size)
+            {
+                Background = affiliationColor,
+                BorderThickness = new Thickness(4, 4, 4, 4),
+                BorderBrush = UnitBorder,
+                CornerRadius = new CornerRadius(100),
+            };
+            Unit.InitiativeMember = Initiativetracker.InitiativeMemberCreator(Unit);
 
             Point startPunkt = new Point(180, 60);
-            Unit.TokenID = IDStarter++;
-
-            // Erstellung des UIElement
-            if(Unit.UIElement == null)
+            //Unit.TokenID = IDStarter++;
+            
+            // Check und Erstellung der Spielfiguren auf dem Canvas
+            if ((bool)Player.IsChecked)
             {
-                // Check und Erstellung der Spielfiguren auf dem Canvas
-                if ((bool)Player.IsChecked)
-                {
+                spielerFiguren.Add(Unit);
 
-                    Unit.Size = (int)CreatureSize.Medium;
-                    Unit.Name = UnitName.Text;
-                    Unit.Side = (int)Affiliation.Player;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    spielerFiguren.Add(Unit);
+            } else if ((bool)Ally.IsChecked)
+            {
+                allies.Add(Unit);
 
-                } else if ((bool)Ally.IsChecked)
-                {
-                    Unit.Size = (int)CreatureSize.Medium;
-                    Unit.Name = UnitName.Text;
-                    Unit.Side = (int)Affiliation.Ally;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    allies.Add(Unit);
-
-                } else if ((bool)FoeM.IsChecked)
-                {
-                    Unit.Size = (int)CreatureSize.Medium;
-                    Unit.Name = UnitName.Text;
-                    Unit.Side = (int)Affiliation.Foe;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    monster.Add(Unit);
-
-                } else if ((bool)FoeL.IsChecked)
-                {
-                    Unit.Size = (int)CreatureSize.Large;
-                    Unit.Name = UnitName.Text;
-                    Unit.Side = (int)Affiliation.Foe;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    monster.Add(Unit);
-
-                } else
-                {
-                    Unit.Size = (int)CreatureSize.ExtraLarge;
-                    Unit.Name = UnitName.Text;
-                    Unit.Side = (int)Affiliation.Foe;
-                    Unit.UIElement = BorderCreatorMethod(Unit);
-                    monster.Add(Unit);
-                }
-                
+            } else
+            {
+                monster.Add(Unit);
             }
+
+            all.Add(Unit);
 
             // Drag&Drop Eventhandler für die Spielfiguren
             MouseButtonEventHandler mouseDown = (sendert, args) => {
@@ -273,7 +297,10 @@ namespace DnDPlayMap
             };
             MouseButtonEventHandler mouseRightClick = (sendert, args) =>
             {
+                Initiativetracker.RemoveInitElement(((CharakterToken)sendert).InitiativeMember);
+                all.Remove((CharakterToken)sendert);
                 GameMap.Children.Remove((UIElement)sendert);
+                InitiativeUpdate();
             };
             Action<UIElement> enableDrag = (element) => {
                 element.MouseDown += mouseDown;
@@ -283,65 +310,15 @@ namespace DnDPlayMap
             };
 
             // Eventhandler für das neue Element aktivieren
-            enableDrag(Unit.UIElement);
-            GameMap.Children.Add(Unit.UIElement);
+            enableDrag(Unit);
+            GameMap.Children.Add(Unit);
 
             // Position des neuen Element im Canvas setzen
-            InkCanvas.SetTop(Unit.UIElement, startPunkt.Y - 10);
-            InkCanvas.SetLeft(Unit.UIElement, startPunkt.X - 10);
+            InkCanvas.SetTop(Unit, startPunkt.Y - 10);
+            InkCanvas.SetLeft(Unit, startPunkt.X - 10);
         }
 
-        // Methode zur Erstellung des UIElement für Spielfiguren
-        private Border BorderCreatorMethod(CharakterToken Unit)
-        {
-            Brush affiliation = Brushes.Gray;
-
-            string name = "";
-
-            switch (Unit.Side)
-            {
-                case (int)Affiliation.Player:
-                    affiliation = Brushes.Green;
-                    name = "P";
-                    break;
-                case (int)Affiliation.Ally:
-                    affiliation = Brushes.SlateBlue;
-                    name = "A";
-                    break;
-                case (int)Affiliation.Foe:
-                    affiliation = Brushes.Red;
-                    name = "M";
-                    break;
-            }
-
-            if (UnitName.Text.Equals(""))
-            {
-                name = name + IDStarter.ToString();
-            } else
-            {
-                name = UnitName.Text;
-            }
-
-            Border borderReturn = new Border()
-            {
-                Width = MapSquareSize * Unit.Size,
-                Height = MapSquareSize * Unit.Size,
-                Background = affiliation,
-                BorderThickness = new Thickness(4, 4, 4, 4),
-                BorderBrush = UnitBorder,
-                CornerRadius = new CornerRadius(100),
-                Child = new TextBlock()
-                {
-                    Text = name,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                }
-
-            };
-
-            return borderReturn;
-        }
-
+        // Veränderung der Stylusfarbe
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
             if (RadioBlack.IsChecked == true)
@@ -355,6 +332,69 @@ namespace DnDPlayMap
             if (RadioRed.IsChecked == true)
             {
                 GameMap.DefaultDrawingAttributes.Color = Colors.Red;
+            }
+        }
+
+        // Methode für die Bestimmung und Definition des vorherigen Aktionsausführers
+        private void InitiativeMoveBack_Click(object sender, RoutedEventArgs e)
+        {
+            Border member = Initiativetracker.MoveBack();
+
+            if (member != null)
+            {
+                foreach (CharakterToken token in all)
+                {
+                    if (token.InitiativeMember.Equals(member))
+                    {
+                        token.Background = Selected;
+
+                    }
+                    else
+                    {
+                        token.Background = token.getColor();
+                    }
+                }
+            }
+        }
+
+        // Methode für die Bestimmung und Definition des nächsten Aktionsausführers
+        private void InitiativeMoveForaward_Click(object sender, RoutedEventArgs e)
+        {
+            Border member = Initiativetracker.MoveForward();
+
+            if (member != null)
+            {
+                foreach (CharakterToken token in all)
+                {
+                    if (token.InitiativeMember.Equals(member))
+                    {
+                        token.Background = Selected;
+
+                    }
+                    else
+                    {
+                        token.Background = token.getColor();
+                    }
+                }
+            }
+        }
+
+        // Methode zur Aktualisierung des InitiativeTrackers
+        private void InitiativeUpdate()
+        {
+            Border member = Initiativetracker.Update();
+
+            foreach(CharakterToken token in all)
+            {
+                if (token.InitiativeMember.Equals(member))
+                {
+                    token.Background = Selected;
+
+                }
+                else
+                {
+                    token.Background = token.getColor();
+                }
             }
         }
     }
