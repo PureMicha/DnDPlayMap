@@ -177,5 +177,54 @@ namespace DnDPlayMap
 
             return action.Key;
         }
+
+        // Methode zum entfernen und aktualisieren von Elementen
+        public void RemoveInitElement(Border element)
+        {
+            int value = initPosition[element];
+
+            initPosition.Remove(element);
+
+            Children.Remove(element);
+
+            if (Children.Count == 0)
+            {
+                action = new KeyValuePair<Border, int>(null, -1);
+
+            } else
+            {
+                foreach(Border item in Children)
+                {
+                    if (initPosition[item] > value)
+                    {
+                        initPosition[item]--;
+
+                        if (item.Equals(action.Key))
+                        {
+                            action = new KeyValuePair<Border, int>(item, initPosition[item]);
+                        }
+                        InitiativeTracker.SetTop(item, 10 + ((initPosition[item]) * 23));
+                        InitiativeTracker.SetLeft(item, 15);
+                    }
+                }
+            }
+        }
+
+        // Update des Trackers zur Bestimmung des des Aktionsausführers
+        public Border Update()
+        {
+            if(initPosition.Count == 0) return null;
+
+            if(initPosition.Count <= action.Value)
+            {
+                action = initPosition.First();
+            }
+
+            action = initPosition.FirstOrDefault(x => x.Value == action.Value);
+
+            action.Key.BorderBrush = Selected;
+
+            return action.Key;
+        }
     }
 }

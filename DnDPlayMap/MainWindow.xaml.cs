@@ -76,9 +76,9 @@ namespace DnDPlayMap
             {
                 foreach (CharakterToken unit in spielerFiguren)
                 {
-                    Initiativetracker.Children.Remove(unit.InitiativeMember);
                     GameMap.Children.Remove(unit);
                     all.Remove(unit);
+                    Initiativetracker.RemoveInitElement(unit.InitiativeMember);
                 }
                 spielerFiguren.Clear();
             }
@@ -86,9 +86,9 @@ namespace DnDPlayMap
             {
                 foreach (CharakterToken unit in allies)
                 {
-                    Initiativetracker.Children.Remove(unit.InitiativeMember);
                     GameMap.Children.Remove(unit);
                     all.Remove(unit);
+                    Initiativetracker.RemoveInitElement(unit.InitiativeMember);
                 }
                 allies.Clear();
             }
@@ -96,9 +96,9 @@ namespace DnDPlayMap
             {
                 foreach (CharakterToken unit in monster)
                 {
-                    Initiativetracker.Children.Remove(unit.InitiativeMember);
                     GameMap.Children.Remove(unit);
                     all.Remove(unit);
+                    Initiativetracker.RemoveInitElement(unit.InitiativeMember);
                 }
                 monster.Clear();
             }
@@ -106,6 +106,7 @@ namespace DnDPlayMap
             {
                 GameMap.Strokes.Clear();
             }
+            InitiativeUpdate();
 
         }
 
@@ -294,10 +295,10 @@ namespace DnDPlayMap
             };
             MouseButtonEventHandler mouseRightClick = (sendert, args) =>
             {
-                Initiativetracker.Children.Remove(((CharakterToken)sendert).InitiativeMember);
+                Initiativetracker.RemoveInitElement(((CharakterToken)sendert).InitiativeMember);
                 all.Remove((CharakterToken)sendert);
                 GameMap.Children.Remove((UIElement)sendert);
-                
+                InitiativeUpdate();
             };
             Action<UIElement> enableDrag = (element) => {
                 element.MouseDown += mouseDown;
@@ -337,15 +338,19 @@ namespace DnDPlayMap
         {
             Border member = Initiativetracker.MoveBack();
 
-            foreach (CharakterToken token in all)
+            if (member != null)
             {
-                if (token.InitiativeMember.Equals(member))
+                foreach (CharakterToken token in all)
                 {
-                    token.Background = Selected;
+                    if (token.InitiativeMember.Equals(member))
+                    {
+                        token.Background = Selected;
 
-                } else
-                {
-                    token.Background = token.getColor();
+                    }
+                    else
+                    {
+                        token.Background = token.getColor();
+                    }
                 }
             }
         }
@@ -355,13 +360,36 @@ namespace DnDPlayMap
         {
             Border member = Initiativetracker.MoveForward();
 
-            foreach (CharakterToken token in all)
+            if (member != null)
+            {
+                foreach (CharakterToken token in all)
+                {
+                    if (token.InitiativeMember.Equals(member))
+                    {
+                        token.Background = Selected;
+
+                    }
+                    else
+                    {
+                        token.Background = token.getColor();
+                    }
+                }
+            }
+        }
+
+        // Methode zur Aktualisierung des InitiativeTrackers
+        private void InitiativeUpdate()
+        {
+            Border member = Initiativetracker.Update();
+
+            foreach(CharakterToken token in all)
             {
                 if (token.InitiativeMember.Equals(member))
                 {
                     token.Background = Selected;
 
-                } else
+                }
+                else
                 {
                     token.Background = token.getColor();
                 }
