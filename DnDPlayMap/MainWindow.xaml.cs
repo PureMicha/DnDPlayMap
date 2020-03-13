@@ -24,6 +24,7 @@ namespace DnDPlayMap
         const int MapSquareSize = 60;
         // Farbe Rand der Spielfiguren
         private SolidColorBrush UnitBorder = (SolidColorBrush)(new BrushConverter().ConvertFrom("#535353"));
+        private SolidColorBrush Selected = Brushes.White;
         // Wert für Karten-Raster Umschaltung
         private bool OnOff = false;
         // CharakterToken TokenID Starter
@@ -32,6 +33,7 @@ namespace DnDPlayMap
         private List<CharakterToken> spielerFiguren = new List<CharakterToken>();
         private List<CharakterToken> monster = new List<CharakterToken>();
         private List<CharakterToken> allies = new List<CharakterToken>();
+        private List<CharakterToken> all = new List<CharakterToken>();
         // Liste der Karten-Kacheln (UIElement)
         private List<UIElement> kartenKacheln = new List<UIElement>();
         // Wert für Start-Position für Drag&Drop
@@ -76,6 +78,7 @@ namespace DnDPlayMap
                 {
                     Initiativetracker.Children.Remove(unit.InitiativeMember);
                     GameMap.Children.Remove(unit);
+                    all.Remove(unit);
                 }
                 spielerFiguren.Clear();
             }
@@ -85,6 +88,7 @@ namespace DnDPlayMap
                 {
                     Initiativetracker.Children.Remove(unit.InitiativeMember);
                     GameMap.Children.Remove(unit);
+                    all.Remove(unit);
                 }
                 allies.Clear();
             }
@@ -94,6 +98,7 @@ namespace DnDPlayMap
                 {
                     Initiativetracker.Children.Remove(unit.InitiativeMember);
                     GameMap.Children.Remove(unit);
+                    all.Remove(unit);
                 }
                 monster.Clear();
             }
@@ -241,7 +246,9 @@ namespace DnDPlayMap
             } else
             {
                 monster.Add(Unit);
-            } 
+            }
+
+            all.Add(Unit);
 
             // Drag&Drop Eventhandler für die Spielfiguren
             MouseButtonEventHandler mouseDown = (sendert, args) => {
@@ -288,6 +295,7 @@ namespace DnDPlayMap
             MouseButtonEventHandler mouseRightClick = (sendert, args) =>
             {
                 Initiativetracker.Children.Remove(((CharakterToken)sendert).InitiativeMember);
+                all.Remove((CharakterToken)sendert);
                 GameMap.Children.Remove((UIElement)sendert);
                 
             };
@@ -323,6 +331,41 @@ namespace DnDPlayMap
                 GameMap.DefaultDrawingAttributes.Color = Colors.Red;
             }
         }
-        
+
+        // Methode für die Bestimmung und Definition des vorherigen Aktionsausführers
+        private void InitiativeMoveBack_Click(object sender, RoutedEventArgs e)
+        {
+            Border member = Initiativetracker.MoveBack();
+
+            foreach (CharakterToken token in all)
+            {
+                if (token.InitiativeMember.Equals(member))
+                {
+                    token.Background = Selected;
+
+                } else
+                {
+                    token.Background = token.getColor();
+                }
+            }
+        }
+
+        // Methode für die Bestimmung und Definition des nächsten Aktionsausführers
+        private void InitiativeMoveForaward_Click(object sender, RoutedEventArgs e)
+        {
+            Border member = Initiativetracker.MoveForward();
+
+            foreach (CharakterToken token in all)
+            {
+                if (token.InitiativeMember.Equals(member))
+                {
+                    token.Background = Selected;
+
+                } else
+                {
+                    token.Background = token.getColor();
+                }
+            }
+        }
     }
 }
